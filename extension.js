@@ -32,11 +32,56 @@ function activate(context) {
 		const text = editor.document.getText()
 		vscode.window.showInformationMessage(`text in active editor: ${text}`)
 		//const args = process.argv[2]
-		//const fileUrl = new URL('file:///Users/kanderson/Desktop/linterTest.js')
 		const buffer = fs.readFileSync('/Users/kanderson/Desktop/linterTest.js').toString()
 		const body = acorn.parse(buffer).body
 		console.log(body)
 
+		class Interpreter {
+			constructor(visitor) {
+				this.visitor = visitor
+			}
+			interpret(nodes) {
+				return this.visitor.run(nodes)
+			}
+		}
+
+		class Visitor {
+			visitExpressionStatement(node) {
+				let callee = node.expression.callee.name
+				let args = node.expression.arguments
+				let formattedArgs = args.map(arg => arg.value).join(', ')
+				console.log(`fuction that was called: ${callee}(${formattedArgs})`)
+			}
+			visitNode(node) {
+				switch (node.type) {
+					case 'ExpressionStatement':
+						return this.visitExpressionStatement(node)
+					default:
+						return `node type ${node.type} not handled`
+				}
+			}
+			visitNodes(nodes) {
+				for (let i = 0; i < nodes.length; i++) {
+					this.visitNode(nodes[i])
+				}
+			}
+			run(nodes) {
+				return this.visitNodes(nodes) //site says .visitNodes(body) ??
+			}
+		}
+
+		// for(let i = 0; i < body.length; i++) {
+		// 	let node = body[i]
+		// 	switch (node.type) {
+		// 		case 'ExpressionStatement':
+		// 			let callee = node.expression.callee.name
+		// 			let args = node.expression.arguments
+		// 			let formatted = args.map(arg => {
+		// 				return arg.value
+		// 			}).join(', ')
+		// 			console.log(`fuction that was called: ${callee}(${formatted})`)
+		// 	}
+		// }
 
 	});
 
