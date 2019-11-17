@@ -53,6 +53,16 @@ function activate(context) {
 				console.log(`fuction that was called: ${callee}(${formattedArgs})`)
 			}
 			visitNode(node) {
+				// ForStatement (body -> body (array)), WhileStatement (body -> body (array)), IfStatement (consequense -> body (array)), FunctionDeclaration (body -> body (array))
+				// pattern... if they have a .body.type of BlockStatement, it could contain a function call
+				// check for nested ExpressionStatement
+				// ^ do recursive call, sending the current node to visitNodes?
+				// if (node.body) {
+				// 	if (node.body.type === 'BlockStatement') {
+				// 		this.visitNodes(node.body.body)
+				// 	}
+				// }
+				// when parsed and handled this way, we see the order in which they're written, not taking into account the actual order in which they're invoked
 				switch (node.type) {
 					case 'ExpressionStatement':
 						return this.visitExpressionStatement(node)
@@ -61,14 +71,17 @@ function activate(context) {
 				}
 			}
 			visitNodes(nodes) {
-				for (let i = 0; i < nodes.length; i++) {
-					this.visitNode(nodes[i])
+				for (const node of nodes) {
+					this.visitNode(node)
 				}
 			}
 			run(nodes) {
 				return this.visitNodes(nodes) //site says .visitNodes(body) ??
 			}
 		}
+
+		const jsInterpreter = new Interpreter(new Visitor())
+		jsInterpreter.interpret(body)
 
 		// for(let i = 0; i < body.length; i++) {
 		// 	let node = body[i]
