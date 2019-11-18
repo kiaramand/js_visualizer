@@ -30,11 +30,12 @@ function activate(context) {
 			return
 		}
 		const text = editor.document.getText()
-		vscode.window.showInformationMessage(`text in active editor: ${text}`)
+		//vscode.window.showInformationMessage(`text in active editor: ${text}`)
 		//const args = process.argv[2]
 		const buffer = fs.readFileSync('/Users/kanderson/Desktop/linterTest.js').toString()
 		const body = acorn.parse(buffer).body
 		console.log(body)
+		let msg = ``
 
 		class Interpreter {
 			constructor(visitor) {
@@ -51,6 +52,7 @@ function activate(context) {
 				let args = node.expression.arguments
 				let formattedArgs = args.map(arg => arg.value).join(', ')
 				console.log(`fuction that was called: ${callee}(${formattedArgs})`)
+				msg = msg + `${callee}(${formattedArgs}) `
 			}
 			visitNode(node) {
 				// ForStatement (body -> body (array)), WhileStatement (body -> body (array)), IfStatement (consequense -> body (array)), FunctionDeclaration (body -> body (array))
@@ -82,6 +84,8 @@ function activate(context) {
 
 		const jsInterpreter = new Interpreter(new Visitor())
 		jsInterpreter.interpret(body)
+
+		vscode.window.showInformationMessage(`your stack: ${msg}`)
 
 		// for(let i = 0; i < body.length; i++) {
 		// 	let node = body[i]
