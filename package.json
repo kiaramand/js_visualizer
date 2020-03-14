@@ -36,7 +36,7 @@
 		"vscode-test": "^1.2.2"
 	},
 	"dependencies": {
-		"acorn": "^7.1.0",
+		"acorn": "^7.1.1",
 		"fs": "0.0.1-security",
 		"node": "^13.1.0"
 	}
